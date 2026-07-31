@@ -1,35 +1,31 @@
 /**
- * @file app_servo.h
- * @version 26053112.280
+ * @file mid_task.h
+ * @version 26051710.070
  */
 
-#ifndef LOAD_APP_SERVO
-#define LOAD_APP_SERVO
+#ifndef LOAD_MID_TASK_H
+#define LOAD_MID_TASK_H
 
 #include "main.h"
+#include "cmn_setting.h"
 
 //******************************************************
 // グローバル型定義
 //******************************************************
 
-typedef struct struct_SERVO_VOLCUR {
-    f1 voltage;
-    f1 current;
-}S_SERVO_VOLCUR;
-
 //******************************************************
 // グローバル変数宣言
 //******************************************************
+
+extern volatile QueueHandle_t xTaskQueue;
 
 //******************************************************
 // グローバル関数宣言
 //******************************************************
 
-void servo_setup(void);
-void servo_get_vc(S_SERVO_VOLCUR* p_s_volcur);
-#if defined USE_M5ATOMICMOTION
-void servo_setspeed(u2 u2_y, u1 u1_ch);
-#endif
-void servo_setspeed(s1 s1_speed);
-
-#endif /* LOAD_APP_SERVO */
+void task_setup(void);
+void task_onEnable_disp(void);
+void task_onDisable_disp(void);
+bool task_xQueueSend(E_TASK_Q e_taskq);
+bool task_xQueueSendToFront(E_TASK_Q e_taskq);
+#endif /* LOAD_MID_TASK_H */

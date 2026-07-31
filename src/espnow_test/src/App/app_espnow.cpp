@@ -7,6 +7,7 @@
 #include "app_espnow.h"
 #include "Mid/mid_m5stack.h"
 
+#include "Network.h"
 #include "ESP32_NOW.h"
 #include "WiFi.h"
 #include <esp_mac.h>  // For the MAC2STR and MACSTR macros
@@ -101,8 +102,8 @@ public:
             recv_msg_count++;
             if (device_is_master) {
                 Serial.printf("Received a message from peer " MACSTR "\n", MAC2STR(addr()));
-                Serial.printf("  Count: %lu\n", msg->s_payload.timestamp);
-                Serial.printf("  Random data: %lu\n", msg->s_payload.randdata);
+                Serial.printf("  Count: %lu\n", msg->payload.timestamp);
+                Serial.printf("  Random data: %lu\n", msg->payload.randdata);
                 last_data.push_back(msg->bytes);
                 last_data.erase(last_data.begin());
             }
@@ -142,13 +143,21 @@ ESP_NOW_Network_Peer* master_peer = nullptr;
 // ローカル関数宣言
 //******************************************************
 
+static void fail_reboot(void);
+
 //******************************************************
 // 関数定義
 //******************************************************
 
+static void fail_reboot(void) {
+    while(true){
+        M5.Power.lightSleep(1000);
+    }
+}
+
 // Callback called when a new peer is found
 void register_new_peer(const esp_now_recv_info_t *info, const uint8_t *data, int len, void *arg) {
-  esp_now_data_t *msg = (esp_now_data_t *)data;
+  S_PAYLOAD *msg = (S_PAYLOAD *)data;
   int priority = msg->priority;
 
   if (priority == self_priority) {
@@ -168,7 +177,7 @@ void register_new_peer(const esp_now_recv_info_t *info, const uint8_t *data, int
     current_peer_count++;
     if (current_peer_count == ESPNOW_PEER_COUNT) {
       Serial.println("All peers have been found");
-      new_msg.ready = true;
+      new_msg.payload.ready = true;
     }
   }
 }
@@ -207,17 +216,9 @@ void espnow_setup(void) {
 
     Serial.println("Setup complete. Broadcasting own priority to find the master...");
     memset(&new_msg, 0, sizeof(new_msg));
-    strncpy(new_msg.str, "Hello!", sizeof(new_msg.str));
-    new_msg.priority = self_priority;
+    strncpy(new_msg.payload.str, "Hello!", sizeof(new_msg.payload.str));
+    new_msg.payload.priority = self_priority;
 
-}
-
-
-// Function to reboot the device
-void fail_reboot() {
-    Serial.println("Rebooting in 5 seconds...");
-    delay(5000);
-    ESP.restart();
 }
 
 #endif /* USE_ESPNOW */

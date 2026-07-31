@@ -6,7 +6,6 @@
 #include "main.h"
 #include "Mid/mid_m5stack.h"
 #include "Mid/mid_task.h"
-#include "App/app_servo.h"
 
 //******************************************************
 // グローバル変数定義
@@ -27,7 +26,6 @@ static s1 s1_cnt;
 static s1 s1_step;
 static u1 u1_wait;
 static bi bi_isrun;
-static S_SERVO_VOLCUR s_volcur;
 
 //******************************************************
 // ローカル関数宣言
@@ -40,7 +38,6 @@ static S_SERVO_VOLCUR s_volcur;
 void setup() {
     m5stack_setup();
     task_setup();
-    servo_setup();
     s1_step = STEP;
     u1_wait = STEP;
     s1_cnt = 0;
@@ -80,28 +77,6 @@ void loop() {
                 DISP_UPDATE_S();
                 disp_canvas.clearDisplay(TFT_BLACK);
                 disp_canvas.setCursor(0, 0);
-                servo_get_vc(&s_volcur);
-                disp_canvas.printf("voltage: %.2f V\n", s_volcur.voltage);
-                disp_canvas.printf("current: %.2f A\n", s_volcur.current);
-                if(bi_isrun) {
-                    u1_wait--;
-                    if(u1_wait < 1){
-                        u1_wait = STEP;
-                        s1_cnt += s1_step;
-                        if(s1_cnt <= -MAX || MAX <= s1_cnt){
-                            s1_step *= -1;
-                        }
-                    }
-                    disp_canvas.printf("s1_cnt=%d\n",s1_cnt);
-                }
-                else{
-                    disp_canvas.println("not run");
-                    s1_step = STEP;
-                    u1_wait = STEP;
-                    s1_cnt = 0;
-                }
-                servo_setspeed(s1_cnt);
-
                 DISP_UPDATE_E();
                 break;
 #endif /* USE_TIMER_250MS */
