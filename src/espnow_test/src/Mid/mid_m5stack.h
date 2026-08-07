@@ -1,6 +1,6 @@
 /**
  * @file mid_m5stack.h
- * @version 26053112.280
+ * @version 26080722.220
  */
 
 #ifndef LOAD_MID_M5STACK_H
@@ -12,8 +12,8 @@
 #define CORE_BTNPOLL(arg_mode)          (((u1)(arg_mode) & (u1)E_BTNMODE_POLLING) == (u1)E_BTNMODE_POLLING)
 
 #ifdef USE_DISP
-#define DISP_TASKWAIT_MS                (100)
 #define DISP_IFSIZE(l,m,s)              ((s_sc.w < 160) ? s : (s_sc.h < 160) ? m : l)
+#define DISP_TASKWAIT_MS                (100)
 #define DISP_UPDATE_S()                 if(xSemaphoreTake(smh_lcd, DISP_TASKWAIT_MS-1) == pdTRUE){
 #define DISP_UPDATE_E()                 xSemaphoreGive(smh_lcd);}
 #endif

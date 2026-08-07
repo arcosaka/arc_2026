@@ -1,6 +1,6 @@
 /**
  * @file app_servo.cpp
- * @version 26060619.530
+ * @version 26080722.220
  */
 
 #include "main.h"
@@ -36,7 +36,8 @@ static Servo servo;
 #define SERVO_R         (1)
 static M5AtomicMotion AtomicMotion;
 #else
-#error "define 'USE_ESP32SERVO' or 'USE_M5ATOMICMOTION'"
+#warning " not define 'USE_ESP32SERVO' and 'USE_M5ATOMICMOTION'"
+#define NONE_SERVO
 #endif
 
 //******************************************************
@@ -88,7 +89,7 @@ void servo_setup() {
     M5.Display.drawString("Motion", M5.Display.width() / 2, M5.Display.height() / 2);
 
 #else
-#error "define 'USE_ESP32SERVO' or 'USE_M5ATOMICMOTION'"
+#warning "not define 'USE_ESP32SERVO' and 'USE_M5ATOMICMOTION'"
 #endif
 }
 
@@ -102,13 +103,32 @@ void servo_get_vc(S_SERVO_VOLCUR* p_s_volcur) {
 #endif
 }
 
-#if defined USE_M5ATOMICMOTION
+
+void servo_joytomotor(u2 joy_x, u2 joy_y) {
+    s2 left  = (s2)joy_x + (s2)joy_y;
+    s2 right = (s2)joy_x - (s2)joy_y;
+
+    /* 正規化 */
+    int maxVal = max(abs(left), abs(right));
+
+    if (maxVal > 511)
+    {
+        left  = left  * 511 / maxVal;
+        right = right * 511 / maxVal;
+    }
+
+    servo_setspeed(COUNT_MIDDLE + left  * 1000 / 511, SERVO_L);
+    servo_setspeed(COUNT_MIDDLE + right * 1000 / 511, SERVO_R);
+}
+
+
 void servo_setspeed(u2 u2_w, u1 u1_ch) {
+#if defined USE_M5ATOMICMOTION
     if(COUNT_LOW <= u2_w && u2_w <= COUNT_HIGH){
         AtomicMotion.setServoPulse(u1_ch, u2_w);
     }
-}
 #endif
+}
 
 void servo_setspeed(s1 s1_speed) {
     u2 u2_y = (u2)s1_speed * ((COUNT_HIGH - COUNT_MIDDLE) / STEP_MAX) + COUNT_MIDDLE;

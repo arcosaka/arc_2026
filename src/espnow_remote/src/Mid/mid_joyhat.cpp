@@ -1,6 +1,6 @@
 /**
  * @file mid_joyhat.cpp
- * @version 26080718.200
+ * @version 26080722.220
  */
 
 #include "mid_m5stack.h"
@@ -33,6 +33,8 @@ static E_JOYHAT_CAL cal_state = CAL_CENTER;     // Current calibration state
 static u1 u8_sda = 0;
 static u1 u8_scl = 0;
 static bi bi_isready = false;
+
+static s2 s2_joyx_min;
 
 //******************************************************
 // ローカル関数宣言
@@ -104,19 +106,22 @@ void joyhat_setup(void) {
     joyhat_begin();
 }
 
-void joyhat_get_xyb(s2* ps2_x, s2* ps2_y, u1* pu1_b){
+void joyhat_get_xyb(u2* pu2_x, u2* pu2_y, u1* pu1_b){
     u2 u2_tmp;
     if(joyhat_begin()) {
-        u2_tmp = joyc.getADCValue(ADC_X);
-        *ps2_x = (s2)u2_tmp;
-        u2_tmp = joyc.getADCValue(ADC_Y);
-        *ps2_y = (s2)u2_tmp;
+        u2_tmp = joyc.getPOSValue(POS_X, _10bit);
+        *pu2_x = u2_tmp;
+        u2_tmp = joyc.getPOSValue(POS_Y, _10bit);
+        *pu2_y = u2_tmp;
         u2_tmp = joyc.getButtonStatus();
         *pu1_b = (u1)u2_tmp;
+        if(((*pu2_x) == 0xFF) && ((*pu2_y) == 0xFF)) {
+            bi_isready = false;
+        }
     }
     else {
-        *ps2_x = 0;
-        *ps2_y = 0;
+        *pu2_x = 0;
+        *pu2_y = 0;
         *pu1_b = 0xFF;
     }
 }

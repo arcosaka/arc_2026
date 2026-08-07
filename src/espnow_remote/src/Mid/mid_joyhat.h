@@ -1,6 +1,6 @@
 /**
  * @file mid_joyhat.h
- * @version 26080718.200
+ * @version 26080722.220
  */
 
 #ifndef LOAD_MID_JOYHAT_H
@@ -22,6 +22,6 @@
 //******************************************************
 
 void joyhat_setup(void);
-void joyhat_get_xyb(s2* ps2_x, s2* ps2_y, u1* pu1_b);
+void joyhat_get_xyb(u2* pu2_x, u2* pu2_y, u1* pu1_b);
 
 #endif /* LOAD_MID_JOYHAT_H */

@@ -1,6 +1,6 @@
 /**
  * @file cmn_setting.h
- * @version 26051710.070
+ * @version 26080722.220
  */
 
 #ifndef LOAD_CMN_SETTING_H
@@ -14,15 +14,18 @@
 
 // Async Task
 //  COREBUF
-#define COREBUF_DISP  (8192)
+#define COREBUF_DISP    (8192)
+#define COREBUF_ESPNOW  (16384)
 
 //  COREPRI
-#define COREPRI_DISP  (7)
+#define COREPRI_DISP    (7)
+#define COREPRI_ESPNOW  (4)
 
 //  CORESEL
-#define CORESEL_DISP  (APP_CPU_NUM)
+#define CORESEL_DISP    (APP_CPU_NUM)
+#define CORESEL_ESPNOW  (APP_CPU_NUM)
 
-#define USE_TIMER_050MS
+//#define USE_TIMER_050MS
 #define USE_TIMER_250MS
 //#define USE_TIMER_1S
 

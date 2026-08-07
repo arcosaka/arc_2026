@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @version 26080718.200
+ * @version 26080722.220
  */
 
 #include "main.h"
@@ -51,29 +51,28 @@ void setup() {
 void loop() {
     BaseType_t ret;
     E_TASK_Q e_task_q;
-    s2 s2_x;
-    s2 s2_y;
+    u2 u2_x;
+    u2 u2_y;
     u1 u1_b;
     e_task_q = E_TASK_Q_MAX;
     ret = xQueueReceive(xTaskQueue, &e_task_q, 0);
     if (ret == pdTRUE) {
         switch (e_task_q) {
             case E_TASK_Q_BUTTON_A:
-                M5.Log.println("BUTTON_A");
+                //M5.Log.println("BUTTON_A");
                 bi_isrun = !bi_isrun;
 #ifdef USE_DISP
                 m5stack_disp_clear_count();
 #endif  /* USE_DISP */
                 break;
             case E_TASK_Q_BUTTON_B:
-                M5.Log.println("BUTTON_B");
-                ESP.restart();
+                //M5.Log.println("BUTTON_B");
                 break;
             case E_TASK_Q_BUTTON_C:
-                M5.Log.println("BUTTON_C");
+                //M5.Log.println("BUTTON_C");
                 break;
             case E_TASK_Q_TIMER125MS:
-                M5.Log.println("TIMER125MS");
+                //M5.Log.println("TIMER125MS");
                 m5stack_loop();
                 break;
 #ifdef USE_TIMER_050MS
@@ -83,10 +82,10 @@ void loop() {
 #endif /* USE_TIMER_050MS */
 #ifdef USE_TIMER_250MS
             case E_TASK_Q_TIMER250MS:
-                M5.Log.println("TIMER250MS");
-                joyhat_get_xyb(&s2_x, &s2_y, &u1_b);
-                payload_tx.payload.joyx = s2_x;
-                payload_tx.payload.joyy = s2_y;
+                //M5.Log.println("TIMER250MS");
+                joyhat_get_xyb(&u2_x, &u2_y, &u1_b);
+                payload_tx.payload.joyx = u2_x;
+                payload_tx.payload.joyy = u2_y;
                 payload_tx.payload.joyb = (u2)u1_b;
                 if(bi_isrun) {
 #ifdef USE_ESPNOW
@@ -98,15 +97,16 @@ void loop() {
                 disp_canvas.clearDisplay(TFT_BLACK);
                 disp_canvas.setCursor(0, 0);
                 disp_canvas.printf(
-                    "joyx=%4d\njoyy=%4d\njoyb=%4d\n"
-                  , payload_tx.payload.joyx
-                  , payload_tx.payload.joyy
-                  , payload_tx.payload.joyb
+                    "tm_l    =%6u\nvoltage =%4u[mV]\ncurrent =%4d[mA]\n"
+                  , payload_tx.payload.tm_l
+                  , payload_rx.payload.voltage
+                  , payload_rx.payload.current
                 );
                 disp_canvas.printf(
-                    "cur =%4d\nvol =%4u\n"
-                  , payload_rx.payload.current
-                  , payload_rx.payload.voltage
+                    "joyx=%4d\njoyy=%4d\njoyb=%4u\n"
+                  , (s2)payload_tx.payload.joyx
+                  , (s2)payload_tx.payload.joyy
+                  , payload_tx.payload.joyb
                 );
                 if(bi_isrun) {
                     disp_canvas.println("run!");
@@ -141,18 +141,21 @@ void loop() {
 #endif /* USE_INT_GPIOEX2 */
 #ifdef USE_DISP
             case E_TASK_Q_DISP_MAIN:
-                M5.Log.printf("DISP_MAIN(%d[ms])\n", s_dev.update);
+                //M5.Log.printf("DISP_MAIN(%d[ms])\n", s_dev.update);
                 m5stack_disp_update();
                 break;
 #endif  /* USE_DISP */
 #ifdef USE_ESPNOW
             case E_TASK_Q_ESPNOW_RX:
                 M5.Log.println("ESPNOW_RX");
-                M5.Log.printf("tm_l\t%6lu\tcur\t%4d\tcur\t%4d\n"
+                M5.Log.printf("tm_l\t%6lu\tcur\t%4d[mA]\tvol\t%4d[mV]\n"
                     , payload_rx.payload.tm_l
                     , payload_rx.payload.current
                     , payload_rx.payload.voltage
                 );
+#ifdef USE_DISP
+                m5stack_disp_clear_count();
+#endif  /* USE_DISP */
                 break;
             case E_TASK_Q_ESPNOW_TX:
                 M5.Log.println("ESPNOW_TX");
@@ -166,6 +169,5 @@ void loop() {
     }
     else {
         M5.Power.lightSleep(2000);
-
     }
 }

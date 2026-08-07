@@ -1,6 +1,6 @@
 /**
  * @file mid_task.cpp
- * @version 26060619.530
+ * @version 26080722.220
  */
 
 #include "mid_task.h"
@@ -204,7 +204,7 @@ bool task_xQueueSend(E_TASK_Q e_taskq) {
     if ((u4)e_taskq < (u4)E_TASK_Q_MAX) {
         ret = xQueueSend(xTaskQueue, &es_task_q[(u4)e_taskq], 0U);
     }
-    return ret != pdPASS;
+    return ret == pdPASS;
 }
 
 bool task_xQueueSendToFront(E_TASK_Q e_taskq) {
@@ -212,7 +212,7 @@ bool task_xQueueSendToFront(E_TASK_Q e_taskq) {
     if ((u4)e_taskq < (u4)E_TASK_Q_MAX) {
         ret = xQueueSendToFront(xTaskQueue, &es_task_q[(u4)e_taskq], 0U);
     }
-    return ret != pdPASS;
+    return ret == pdPASS;
 }
 
 #endif  /* LOAD_MID_TASK_H */

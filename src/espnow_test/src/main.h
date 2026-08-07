@@ -1,6 +1,6 @@
 /**
  * @file main.h
- * @version 26053112.280
+ * @version 26080722.220
  */
 
 #ifndef LOAD_MAIN_H
@@ -8,6 +8,8 @@
 
 #include <Arduino.h>
 #include <M5Unified.h>
+#include "build_info.h"
+#include "device_info.h"
 
 //******************************************************
 // グローバル型定義

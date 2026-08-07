@@ -1,6 +1,6 @@
 /**
  * @file app_servo.h
- * @version 26053112.280
+ * @version 26080722.220
  */
 
 #ifndef LOAD_APP_SERVO
@@ -27,9 +27,8 @@ typedef struct struct_SERVO_VOLCUR {
 
 void servo_setup(void);
 void servo_get_vc(S_SERVO_VOLCUR* p_s_volcur);
-#if defined USE_M5ATOMICMOTION
+void servo_joytomotor(u2 joy_x, u2 joy_y);
 void servo_setspeed(u2 u2_y, u1 u1_ch);
-#endif
 void servo_setspeed(s1 s1_speed);
 
 #endif /* LOAD_APP_SERVO */

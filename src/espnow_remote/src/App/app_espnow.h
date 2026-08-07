@@ -1,6 +1,6 @@
 /**
  * @file app_espnow.h
- * @version 26080718.200
+ * @version 26080722.220
  */
 
 #ifndef LOAD_APP_ESPNOW
@@ -20,8 +20,8 @@ typedef struct struct_PAYLOAD {
     u4 tm_l;        /** [ 4: 1: 0] */
     s2 current;     /** [ 4: 2: 0] */
     u2 voltage;     /** [ 4: 2: 2] */
-    s2 joyx;        /** [ 2: 3: 0] */
-    s2 joyy;        /** [ 2: 3: 2] */
+    u2 joyx;        /** [ 2: 3: 0] */
+    u2 joyy;        /** [ 2: 3: 2] */
     u2 joyb;        /** [ 2: 4: 0] */
     u2 footer;      /** [ 2: 4: 2] */
 } S_PAYLOAD;

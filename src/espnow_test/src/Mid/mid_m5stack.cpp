@@ -1,6 +1,6 @@
 /**
  * @file mid_m5stack.cpp
- * @version 26053112.280
+ * @version 26080722.220
  */
 
 #include "mid_m5stack.h"
@@ -49,7 +49,6 @@ static u1 u1_disp_britness = 0;
 
 void m5stack_setup(void){
     auto cfg = M5.config();
-
     cfg.serial_baudrate = SERIAL_BAUD;
     M5.begin(cfg);
     M5.delay(1000);
@@ -129,7 +128,7 @@ void m5stack_setup(void){
             break;
         case m5gfx::board_t::board_M5StickCPlus:
             s_dev.devtype = E_DEVTYPE_M5_STCP;
-            s_dev.update = 50;
+            s_dev.update = 100;
             s_dev.dispoff = 60 * 1000L;
             s_dev.scale = 2U;
             btna.pin = gpio_num_t::GPIO_NUM_37;

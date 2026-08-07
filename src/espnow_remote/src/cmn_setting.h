@@ -1,6 +1,6 @@
 /**
  * @file cmn_setting.h
- * @version 26080718.200
+ * @version 26080722.220
  */
 
 #ifndef LOAD_CMN_SETTING_H
