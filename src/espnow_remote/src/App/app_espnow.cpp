@@ -1,25 +1,26 @@
 /**
  * @file app_espnow.cpp
- * @version 26060619.530
+ * @version 26080718.200
  */
 
-#ifdef USE_ESPNOW
 #include "app_espnow.h"
-#include "Mid/mid_m5stack.h"
+#include "../Mid/mid_espnow.h"
+#include "../Mid/mid_task.h"
 
+#ifdef USE_ESPNOW
 #include <esp_mac.h>  // For the MAC2STR and MACSTR macros
-#include "Network.h"
 #include "ESP32_NOW_Serial.h"
 #include "MacAddress.h"
 #include "WiFi.h"
 #include "esp_wifi.h"
-
+#endif /* USE_ESPNOW */
 
 //******************************************************
 // グローバル変数定義
 //******************************************************
 
-volatile U_PAYLOAD u_payload;
+U_PAYLOAD payload_rx;
+U_PAYLOAD payload_tx;
 
 //******************************************************
 // ローカル型定義
@@ -29,46 +30,95 @@ volatile U_PAYLOAD u_payload;
 // ローカル変数定義
 //******************************************************
 
-// 0: AP mode, 1: Station mode
-#define ESPNOW_WIFI_MODE_STATION 1
+#define ESPNOW_HEADER                   ((u2)0x5A5AU)
+#define ESPNOW_FOOTER                   ((u2)0xA5A5U)
 
-// Channel to be used by the ESP-NOW protocol
-#define ESPNOW_WIFI_CHANNEL 1
-
-#if ESPNOW_WIFI_MODE_STATION          // ESP-NOW using WiFi Station mode
-#define ESPNOW_WIFI_MODE WIFI_STA     // WiFi Mode
-#define ESPNOW_WIFI_IF   WIFI_IF_STA  // WiFi Interface
-#else                                 // ESP-NOW using WiFi AP mode
-#define ESPNOW_WIFI_MODE WIFI_AP      // WiFi Mode
-#define ESPNOW_WIFI_IF   WIFI_IF_AP   // WiFi Interface
-#endif
-
-// Set the MAC address of the device that will receive the data
-// For example: F4:12:FA:40:64:4C
-const MacAddress peer_mac({0xF4, 0x12, 0xFA, 0x40, 0x64, 0x4C});
-
-ESP_NOW_Serial_Class NowSerial(peer_mac, ESPNOW_WIFI_CHANNEL, ESPNOW_WIFI_IF);
+static bool bi_isready = false;
+static bool bi_isrun = false;
 
 //******************************************************
 // ローカル関数宣言
 //******************************************************
 
+static void espnow_rx(void* pvParameters);
+static void espnow_tx(void* pvParameters);
+
+
 //******************************************************
 // 関数定義
 //******************************************************
 
-void espnow_setup(void) {
-  WiFi.mode(ESPNOW_WIFI_MODE);
-  WiFi.setChannel(ESPNOW_WIFI_CHANNEL, WIFI_SECOND_CHAN_NONE);
-
-  while (!(WiFi.STA.started() || WiFi.AP.started())) {
-    delay(100);
-  }
-
-  Serial.print("MAC Address: ");
-  Serial.println(ESPNOW_WIFI_MODE == WIFI_AP ? WiFi.softAPmacAddress() : WiFi.macAddress());
-  NowSerial.begin(115200);
-  Serial.printf("ESP-NOW version: %d, max data length: %d\n", ESP_NOW.getVersion(), ESP_NOW.getMaxDataLen());
+static void espnow_midsetup(void){
+#ifdef USE_ESPNOW
+    if(!bi_isready){
+        espnow_setup();
+        bi_isready = true;
+    }
+#endif /* USE_ESPNOW */
 }
 
+static void espnow_rx(void* pvParameters) {
+#ifdef USE_ESPNOW
+    U_PAYLOAD payload_tmp;
+    while (1) {
+        if(!bi_isrun && espnow_getrx(payload_tmp.bytes)){
+            bi_isrun = true;
+            if((payload_tmp.payload.header == ESPNOW_HEADER) && (payload_tmp.payload.footer == ESPNOW_FOOTER)){
+                memcpy(payload_rx.bytes, payload_tmp.bytes,sizeof(S_PAYLOAD));
+                task_xQueueSend(E_TASK_Q_ESPNOW_RX);
+            }
+            bi_isrun = false;
+        }
+        else{
+            M5.delay(50);
+        }
+    }
 #endif /* USE_ESPNOW */
+    vTaskDelete(NULL);
+}
+
+static void espnow_tx(void* pvParameters) {
+#ifdef USE_ESPNOW
+    if(!bi_isrun){
+        bi_isrun = true;
+        u8 u8_tm = (u8)esp_timer_get_time();
+        payload_tx.payload.header = ESPNOW_HEADER;
+        payload_tx.payload.tm_h = (u2)(u8_tm >> 32U & 0xFFFFU);
+        payload_tx.payload.tm_l = (u4)(u8_tm & 0xFFFFFFFFU);
+        payload_tx.payload.footer = ESPNOW_FOOTER;
+        espnow_settx(payload_tx.bytes);
+        bi_isrun = false;
+    }
+#endif /* USE_ESPNOW */
+    vTaskDelete(NULL);
+}
+
+void espnow_rxAsync(void) {
+#ifdef USE_ESPNOW
+    espnow_midsetup();
+    xTaskCreatePinnedToCore(
+        espnow_rx
+        , "espnow_rx"
+        , COREBUF_ESPNOW
+        , NULL
+        , COREPRI_ESPNOW
+        , NULL
+        , CORESEL_ESPNOW
+    );
+#endif /* USE_ESPNOW */
+}
+
+void espnow_txAsync(void) {
+#ifdef USE_ESPNOW
+    espnow_midsetup();
+    xTaskCreatePinnedToCore(
+        espnow_tx
+        , "espnow_tx"
+        , COREBUF_ESPNOW
+        , NULL
+        , COREPRI_ESPNOW
+        , NULL
+        , CORESEL_ESPNOW
+    );
+#endif /* USE_ESPNOW */
+}

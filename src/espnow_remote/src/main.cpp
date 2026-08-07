@@ -1,11 +1,13 @@
 /**
  * @file main.cpp
- * @version 26060619.530
+ * @version 26080718.200
  */
 
 #include "main.h"
 #include "Mid/mid_m5stack.h"
 #include "Mid/mid_task.h"
+#include "App/app_espnow.h"
+#include "Mid/mid_joyhat.h"
 
 //******************************************************
 // グローバル変数定義
@@ -37,33 +39,41 @@ static bi bi_isrun;
 
 void setup() {
     m5stack_setup();
+    joyhat_setup();
     task_setup();
     s1_step = STEP;
     u1_wait = STEP;
     s1_cnt = 0;
     bi_isrun = false;
+    espnow_rxAsync();
 }
 
 void loop() {
     BaseType_t ret;
     E_TASK_Q e_task_q;
+    s2 s2_x;
+    s2 s2_y;
+    u1 u1_b;
     e_task_q = E_TASK_Q_MAX;
-    M5.Power.lightSleep(2000);
     ret = xQueueReceive(xTaskQueue, &e_task_q, 0);
     if (ret == pdTRUE) {
         switch (e_task_q) {
             case E_TASK_Q_BUTTON_A:
+                M5.Log.println("BUTTON_A");
                 bi_isrun = !bi_isrun;
-                //M5.Log.println("BUTTON_A");
+#ifdef USE_DISP
+                m5stack_disp_clear_count();
+#endif  /* USE_DISP */
                 break;
             case E_TASK_Q_BUTTON_B:
-                //M5.Log.println("BUTTON_B");
+                M5.Log.println("BUTTON_B");
+                ESP.restart();
                 break;
             case E_TASK_Q_BUTTON_C:
-                //M5.Log.println("BUTTON_C");
+                M5.Log.println("BUTTON_C");
                 break;
             case E_TASK_Q_TIMER125MS:
-                //M5.Log.println("TIMER125MS");
+                M5.Log.println("TIMER125MS");
                 m5stack_loop();
                 break;
 #ifdef USE_TIMER_050MS
@@ -73,11 +83,40 @@ void loop() {
 #endif /* USE_TIMER_050MS */
 #ifdef USE_TIMER_250MS
             case E_TASK_Q_TIMER250MS:
-                //M5.Log.println("TIMER250MS");
+                M5.Log.println("TIMER250MS");
+                joyhat_get_xyb(&s2_x, &s2_y, &u1_b);
+                payload_tx.payload.joyx = s2_x;
+                payload_tx.payload.joyy = s2_y;
+                payload_tx.payload.joyb = (u2)u1_b;
+                if(bi_isrun) {
+#ifdef USE_ESPNOW
+                    task_xQueueSend(E_TASK_Q_ESPNOW_TX);
+#endif  /* USE_ESPNOW */
+                }
+#ifdef USE_DISP
                 DISP_UPDATE_S();
                 disp_canvas.clearDisplay(TFT_BLACK);
                 disp_canvas.setCursor(0, 0);
+                disp_canvas.printf(
+                    "joyx=%4d\njoyy=%4d\njoyb=%4d\n"
+                  , payload_tx.payload.joyx
+                  , payload_tx.payload.joyy
+                  , payload_tx.payload.joyb
+                );
+                disp_canvas.printf(
+                    "cur =%4d\nvol =%4u\n"
+                  , payload_rx.payload.current
+                  , payload_rx.payload.voltage
+                );
+                if(bi_isrun) {
+                    disp_canvas.println("run!");
+                }
+                else{
+                    disp_canvas.println("not run");
+                }
                 DISP_UPDATE_E();
+#endif  /* USE_DISP */
+
                 break;
 #endif /* USE_TIMER_250MS */
 #ifdef USE_TIMER_1S
@@ -102,13 +141,31 @@ void loop() {
 #endif /* USE_INT_GPIOEX2 */
 #ifdef USE_DISP
             case E_TASK_Q_DISP_MAIN:
-                //M5.Log.println("DISP_MAIN");
+                M5.Log.printf("DISP_MAIN(%d[ms])\n", s_dev.update);
                 m5stack_disp_update();
                 break;
 #endif  /* USE_DISP */
+#ifdef USE_ESPNOW
+            case E_TASK_Q_ESPNOW_RX:
+                M5.Log.println("ESPNOW_RX");
+                M5.Log.printf("tm_l\t%6lu\tcur\t%4d\tcur\t%4d\n"
+                    , payload_rx.payload.tm_l
+                    , payload_rx.payload.current
+                    , payload_rx.payload.voltage
+                );
+                break;
+            case E_TASK_Q_ESPNOW_TX:
+                M5.Log.println("ESPNOW_TX");
+                espnow_txAsync();
+                break;
+#endif  /* USE_ESPNOW */
+            default:
+                M5.Power.lightSleep(2000);
+                break;
         }
     }
     else {
-        M5.delay(1);
+        M5.Power.lightSleep(2000);
+
     }
 }

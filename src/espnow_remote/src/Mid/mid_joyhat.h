@@ -1,10 +1,10 @@
 /**
- * @file mid_task.h
+ * @file mid_joyhat.h
  * @version 26080718.200
  */
 
-#ifndef LOAD_MID_TASK_H
-#define LOAD_MID_TASK_H
+#ifndef LOAD_MID_JOYHAT_H
+#define LOAD_MID_JOYHAT_H
 
 #include "main.h"
 #include "cmn_setting.h"
@@ -17,15 +17,11 @@
 // グローバル変数宣言
 //******************************************************
 
-extern volatile QueueHandle_t xTaskQueue;
-
 //******************************************************
 // グローバル関数宣言
 //******************************************************
 
-void task_setup(void);
-void task_onEnable_disp(void);
-void task_onDisable_disp(void);
-bool task_xQueueSend(E_TASK_Q e_taskq);
-bool task_xQueueSendToFront(E_TASK_Q e_taskq);
-#endif /* LOAD_MID_TASK_H */
+void joyhat_setup(void);
+void joyhat_get_xyb(s2* ps2_x, s2* ps2_y, u1* pu1_b);
+
+#endif /* LOAD_MID_JOYHAT_H */
