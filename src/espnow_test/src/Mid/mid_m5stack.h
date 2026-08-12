@@ -1,6 +1,6 @@
 /**
  * @file mid_m5stack.h
- * @version 26080722.220
+ * @version 26081222.160
  */
 
 #ifndef LOAD_MID_M5STACK_H
@@ -104,9 +104,7 @@ extern SemaphoreHandle_t smh_lcd;
 
 void m5stack_setup(void);
 void m5stack_loop(void);
-#ifdef USE_DISP
 void m5stack_disp_clear_count(void);
 void m5stack_disp_update(void);
-#endif /* USE_DISP */
 
 #endif /* LOAD_MID_M5STACK_H */

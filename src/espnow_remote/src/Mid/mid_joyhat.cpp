@@ -1,6 +1,6 @@
 /**
  * @file mid_joyhat.cpp
- * @version 26080722.220
+ * @version 26081222.160
  */
 
 #include "mid_m5stack.h"
@@ -11,6 +11,8 @@
 //******************************************************
 // グローバル変数定義
 //******************************************************
+
+M5HatMiniJoyC joyc;                             // Joystick object
 
 //******************************************************
 // ローカル型定義
@@ -28,7 +30,6 @@ typedef enum enum_JOYHAT_CAL{
 // ローカル変数定義
 //******************************************************
 
-M5HatMiniJoyC joyc;                             // Joystick object
 static E_JOYHAT_CAL cal_state = CAL_CENTER;     // Current calibration state
 static u1 u8_sda = 0;
 static u1 u8_scl = 0;
@@ -104,6 +105,18 @@ void joyhat_setup(void) {
             break;
     }
     joyhat_begin();
+}
+
+void joyhat_set_led(u4 u4_rgb888) {
+    joyc.setLEDColor(u4_rgb888);
+}
+
+void joyhat_set_led(u4 u4_r8, u4 u4_g8, u4 u4_b8) {
+    joyc.setLEDColor(
+       ((u4_r8 & 0xFFU) << 16U)
+     + ((u4_g8 & 0xFFU) << 8U)
+     +  (u4_b8 & 0xFFU)
+    );
 }
 
 void joyhat_get_xyb(u2* pu2_x, u2* pu2_y, u1* pu1_b){

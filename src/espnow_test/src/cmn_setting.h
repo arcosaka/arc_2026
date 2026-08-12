@@ -1,6 +1,6 @@
 /**
  * @file cmn_setting.h
- * @version 26080722.220
+ * @version 26081222.160
  */
 
 #ifndef LOAD_CMN_SETTING_H
@@ -26,8 +26,8 @@
 #define CORESEL_ESPNOW  (APP_CPU_NUM)
 
 //#define USE_TIMER_050MS
-#define USE_TIMER_250MS
-//#define USE_TIMER_1S
+//#define USE_TIMER_250MS
+#define USE_TIMER_1S
 
 //******************************************************
 // グローバル型定義

@@ -1,23 +1,51 @@
 /**
  * @file app_espnow.h
- * @version 26080722.220
+ * @version 26081222.160
  */
 
 #ifndef LOAD_APP_ESPNOW
 #define LOAD_APP_ESPNOW
 
 #include "main.h"
-#include "cmn_setting.h"
 
 //******************************************************
 // グローバル型定義
 //******************************************************
 
+typedef struct struct_BITFLAG_BODY {
+    u1 isbody   : 1;
+    u1 isready  : 1;
+    u1 dummy_02 : 1;
+    u1 dummy_03 : 1;
+    u1 dummy_04 : 1;
+    u1 dummy_05 : 1;
+    u1 dummy_06 : 1;
+    u1 dummy_07 : 1;
+} S_BITFLAG_BODY;
+
+typedef struct struct_BITFLAG_REMOTE {
+    u1 isremote : 1;
+    u1 isready  : 1;
+    u1 dummy_02 : 1;
+    u1 dummy_03 : 1;
+    u1 dummy_04 : 1;
+    u1 dummy_05 : 1;
+    u1 dummy_06 : 1;
+    u1 dummy_07 : 1;
+} S_BITFLAG_REMOTE;
+
 typedef struct struct_PAYLOAD {
                     /**  sz  x  y  */
     u2 header;      /** [ 2: 0: 0] */
-    u2 tm_h;        /** [ 2: 0: 2] */
-    u4 tm_l;        /** [ 4: 1: 0] */
+    union {
+        S_BITFLAG_BODY bits;
+        u1 b;
+    } body;         /** [ 1: 0: 2] */
+    union {
+        S_BITFLAG_REMOTE bits;
+        u1 b;
+    } remote;       /** [ 1: 0: 3] */
+    u4 tm;          /** [ 4: 1: 0] */
     s2 current;     /** [ 4: 2: 0] */
     u2 voltage;     /** [ 4: 2: 2] */
     u2 joyx;        /** [ 2: 3: 0] */
@@ -42,6 +70,7 @@ extern U_PAYLOAD payload_tx;
 // グローバル関数宣言
 //******************************************************
 
+bi espnow_isrxtimeout(void);
 void espnow_rxAsync(void);
 void espnow_txAsync(void);
 

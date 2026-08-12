@@ -1,6 +1,6 @@
 /**
  * @file mid_m5stack.cpp
- * @version 26080722.220
+ * @version 26081222.160
  */
 
 #include "mid_m5stack.h"
@@ -80,7 +80,7 @@ void m5stack_setup(void){
         case m5gfx::board_t::board_M5AtomS3:
             s_dev.devtype = E_DEVTYPE_M5_AT3N;
             s_dev.update = 50;
-            s_dev.dispoff = 30 * 60 * 1000L;
+            s_dev.dispoff = 30 * 1000L;
             s_dev.scale = 1U;
             btna.pin = gpio_num_t::GPIO_NUM_41;
             btna.mode = E_BTNMODE_FALLING;
@@ -96,7 +96,7 @@ void m5stack_setup(void){
         case m5gfx::board_t::board_M5AtomS3R:
             s_dev.devtype = E_DEVTYPE_M5_AT3R;
             s_dev.update = 50;
-            s_dev.dispoff = 30 * 60 * 1000L;
+            s_dev.dispoff = 30 * 1000L;
             s_dev.scale = 1U;
             btna.pin = gpio_num_t::GPIO_NUM_41;
             btna.mode = E_BTNMODE_FALLING;
@@ -197,19 +197,25 @@ void m5stack_loop(void){
     }
 }
 
-#ifdef USE_DISP
 static bool m5stack_disp_is_show(void){
+#ifdef USE_DISP
     return (u2_disp_cnt < DISP_OFF_CNT);
+#else
+    return false;
+#endif /* USE_DISP */
 }
 
 void m5stack_disp_clear_count(void){
+#ifdef USE_DISP
     u2_disp_cnt = 0;
 #ifdef LOAD_MID_TASK_H
     task_onEnable_disp();
 #endif /* LOAD_MID_TASK_H */
+#endif /* USE_DISP */
 }
 
 void m5stack_disp_update(void) {
+#ifdef USE_DISP
     M5.Display.startWrite();
     if(m5stack_disp_is_show()) {
         DISP_UPDATE_S();
@@ -238,5 +244,5 @@ void m5stack_disp_update(void) {
     if(u2_disp_cnt < UINT16_MAX) {
         u2_disp_cnt++;
     }
-}
 #endif /* USE_DISP */
+}

@@ -1,6 +1,6 @@
 /**
  * @file mid_task.h
- * @version 26080722.220
+ * @version 26081222.160
  */
 
 #ifndef LOAD_MID_TASK_H
@@ -24,6 +24,8 @@ extern volatile QueueHandle_t xTaskQueue;
 //******************************************************
 
 void task_setup(void);
+void task_onEnable(E_TASK_TIMER e_timer);
+void task_onDisable(E_TASK_TIMER e_timer);
 void task_onEnable_disp(void);
 void task_onDisable_disp(void);
 bool task_xQueueSend(E_TASK_Q e_taskq);

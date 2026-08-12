@@ -1,10 +1,11 @@
 /**
  * @file mid_espnow.cpp
- * @version 26080722.220
+ * @version 26081222.160
  */
 
 #include "mid_espnow.h"
 #include "mid_m5stack.h"
+#include "Mid/mid_pref.h"
 
 #ifdef USE_ESPNOW
 #include <esp_mac.h>  // For the MAC2STR and MACSTR macros
@@ -46,10 +47,9 @@ volatile SemaphoreHandle_t smh_espnow;
 #define ESPNOW_WIFI_IF   WIFI_IF_AP     // WiFi Interface
 #endif
 
-// Set the MAC address of the device that will receive the data
-const MacAddress peer_mac(DEVICE_MACADR);
+ESP_NOW_Serial_Class* NowSerial = nullptr;
+bi bi_isready = false;
 
-ESP_NOW_Serial_Class NowSerial(peer_mac, ESPNOW_WIFI_CHANNEL, ESPNOW_WIFI_IF);
 #endif /* USE_ESPNOW */
 
 //******************************************************
@@ -62,11 +62,16 @@ ESP_NOW_Serial_Class NowSerial(peer_mac, ESPNOW_WIFI_CHANNEL, ESPNOW_WIFI_IF);
 
 void espnow_setup(void) {
 #ifdef USE_ESPNOW
+    u1 u1_ch = ESPNOW_WIFI_CHANNEL;
+    if(u4_wifi_ch > 0){
+        u1_ch = (u1)u4_wifi_ch;
+    }
+
     int int_semaphore;
     smh_espnow = xSemaphoreCreateBinary();
     xSemaphoreGiveFromISR(smh_espnow, &int_semaphore);
     WiFi.mode(ESPNOW_WIFI_MODE);
-    WiFi.setChannel(ESPNOW_WIFI_CHANNEL, WIFI_SECOND_CHAN_NONE);
+    WiFi.setChannel(u1_ch, WIFI_SECOND_CHAN_NONE);
 
     while (!(WiFi.STA.started() || WiFi.AP.started())) {
         delay(10);
@@ -80,9 +85,21 @@ void espnow_setup(void) {
         ? WiFi.softAPmacAddress().c_str()
         : WiFi.macAddress().c_str()
     );
-    NowSerial.begin(115200);
-    NowSerial.setTxBufferSize(ESPNOW_BUFFSIZE);
-    NowSerial.setRxBufferSize(ESPNOW_BUFFSIZE);
+
+    const MacAddress peer_mac(chr_wifi_peer);
+    NowSerial = new ESP_NOW_Serial_Class(
+        peer_mac,
+        u1_ch,
+        ESPNOW_WIFI_IF
+    );
+    NowSerial->setChannel(u1_ch);
+    M5.Log.printf("NowSerial.peer=`%s`\n", chr_wifi_peer);
+    M5.Log.printf("NowSerial.ch=%d\n", u1_ch);
+    bi_isready = NowSerial->begin(115200);
+    M5.Log.printf("NowSerial bi_isready=%s\n", bi_isready ? "TRUE " : "FALSE");
+
+    NowSerial->setTxBufferSize(ESPNOW_BUFFSIZE);
+    NowSerial->setRxBufferSize(ESPNOW_BUFFSIZE);
     M5.Log.printf(
         "ESP-NOW version: %d, max data length: %d\n"
       , ESP_NOW.getVersion()
@@ -96,7 +113,7 @@ bool espnow_getrx(u1* pu1_rxdata, u2 u2_size) {
     bool bi_ret = false;
 #ifdef USE_ESPNOW
     ESPNOW_UPDATE_S();
-    if(NowSerial.read(pu1_rxdata, u2_size) == u2_size){
+    if(NowSerial->read(pu1_rxdata, u2_size) == u2_size){
         bi_ret = true;
     }
     ESPNOW_UPDATE_E();
@@ -108,7 +125,7 @@ bool espnow_settx(u1* pu1_txdata, u2 u2_size) {
     bool bi_ret = false;
 #ifdef USE_ESPNOW
     ESPNOW_UPDATE_S();
-    if(NowSerial.write(pu1_txdata, u2_size) == u2_size){
+    if(NowSerial->write(pu1_txdata, u2_size) == u2_size){
         bi_ret = true;
     }
     ESPNOW_UPDATE_E();

@@ -1,6 +1,6 @@
 /**
  * @file mid_task.cpp
- * @version 26080722.220
+ * @version 26081222.160
  */
 
 #include "mid_task.h"
@@ -57,6 +57,14 @@ void IRAM_ATTR task_onTimer_1000ms() {
     xQueueSendFromISR(xTaskQueue, &es_task_q[E_TASK_Q_TIMER1S], 0U);
 }
 #endif /* USE_TIMER_1S */
+
+void task_onEnable(E_TASK_TIMER e_timer){
+    timerStart(hwtimer[e_timer]);
+}
+
+void task_onDisable(E_TASK_TIMER e_timer){
+    timerStop(hwtimer[e_timer]);
+}
 
 #ifdef USE_DISP
 void IRAM_ATTR task_onTimer_disp() {

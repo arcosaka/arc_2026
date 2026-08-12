@@ -1,6 +1,6 @@
 /**
  * @file app_servo.cpp
- * @version 26080722.220
+ * @version 26081222.160
  */
 
 #include "main.h"
@@ -74,7 +74,7 @@ void servo_setup() {
 
         default:
             M5.Display.clear();
-            M5.Display.drawString("Board Fail", M5.Display.width() / 2, M5.Display.height() / 2);
+            M5.Display.println("Board Fail");
             while (true) {
                 M5.Power.lightSleep(1000);
             }
@@ -82,11 +82,11 @@ void servo_setup() {
     }
     while (!AtomicMotion.begin(&Wire, M5_ATOMIC_MOTION_I2C_ADDR, u8_sda, u8_scl, 100000)) {
         M5.Display.clear();
-        M5.Display.drawString("Init Fail", M5.Display.width() / 2, M5.Display.height() / 2);
+        M5.Display.println("AtomicMotion Init Fail");
         delay(1000);
     }
     M5.Display.clear();
-    M5.Display.drawString("Motion", M5.Display.width() / 2, M5.Display.height() / 2);
+    M5.Display.println("Motion");
 
 #else
 #warning "not define 'USE_ESP32SERVO' and 'USE_M5ATOMICMOTION'"
@@ -133,7 +133,6 @@ void servo_setspeed(u2 u2_w, u1 u1_ch) {
 void servo_setspeed(s1 s1_speed) {
     u2 u2_y = (u2)s1_speed * ((COUNT_HIGH - COUNT_MIDDLE) / STEP_MAX) + COUNT_MIDDLE;
     if(COUNT_LOW <= u2_y && u2_y <= COUNT_HIGH){
-        M5.Log.printf("s1_cnt=%u\n",u2_y);
 #if defined USE_ESP32SERVO
         servo.writeMicroseconds(u2_y);
 #elif defined USE_M5ATOMICMOTION
