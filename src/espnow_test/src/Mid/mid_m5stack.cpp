@@ -1,6 +1,6 @@
 /**
  * @file mid_m5stack.cpp
- * @version 26081222.160
+ * @version 26081423.330
  */
 
 #include "mid_m5stack.h"
@@ -47,15 +47,19 @@ static u1 u1_disp_britness = 0;
 // 関数定義
 //******************************************************
 
+static void m5stack_get_batt(void){
+
+}
+
 void m5stack_setup(void){
     auto cfg = M5.config();
     cfg.serial_baudrate = SERIAL_BAUD;
+    cfg.internal_mic = false;
+    cfg.internal_spk = false;
+    cfg.internal_rtc = false;
     M5.begin(cfg);
     M5.delay(1000);
-
     M5.Display.setTextScroll(true);
-
-
     auto board = M5.getBoard();
     switch (board) {
 #if defined (CONFIG_IDF_TARGET_ESP32S3)
@@ -65,7 +69,6 @@ void m5stack_setup(void){
             s_dev.dispoff = 60 * 60 * 1000L;
             s_dev.scale = 2U;
             s_btn.t.mode = E_BTNMODE_POLLING;
-
             break;
         case m5gfx::board_t::board_M5StickS3:
             s_dev.devtype = E_DEVTYPE_M5_STS3;
