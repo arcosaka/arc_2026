@@ -1,6 +1,6 @@
 /**
  * @file mid_m5stack.h
- * @version 26081222.160
+ * @version 26081620.030
  */
 
 #ifndef LOAD_MID_M5STACK_H
@@ -69,9 +69,10 @@ typedef struct struct_DEVINFO {
     u2 h;                   /** 画面高さ[px] */
     u1 scale;               /** 拡大率[倍] */
     bi landscape;           /** 横向き[-] */
+    bi psram;               /** 外部PSRAM使用[-] */
+    bi isbatt;              /** バッテリー内蔵 */
     u4 update;              /** 描写更新間隔[ms] */
     u4 dispoff;             /** 画面OFF時間[ms] */
-    bi psram;               /** 外部PSRAM使用[-] */
 } S_DEVINFO;
 
 typedef struct struct_BTNPINS {
@@ -85,7 +86,6 @@ typedef struct struct_BTNPINS {
     S_BTNPIN ex1;           /** EX1 */
     S_BTNPIN ex2;           /** EX2 */
 } S_BTNPINS;
-
 
 //******************************************************
 // グローバル変数宣言

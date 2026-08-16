@@ -1,6 +1,6 @@
 /**
  * @file app_websetup.cpp
- * @version 26081222.160
+ * @version 26081620.030
  */
 
 #include "app_websetup.h"
@@ -91,6 +91,7 @@ static void websetup_set() {
 
 void websetup_setup(void) {
 
+    M5.Log.setDisplay(&M5.Display);
     if (!SPIFFS.begin()) {
         M5.Log.println("SPIFFS Mount Failed");
         return;
@@ -101,30 +102,31 @@ void websetup_setup(void) {
         return;
     }
 
-    WiFi.mode(WIFI_AP);
+    WiFi.mode(WIFI_AP_STA);
 
     while (!(WiFi.STA.started() || WiFi.AP.started())) {
         delay(10);
     }
 
 
-    String apMac = WiFi.softAPmacAddress();
-    const MacAddress macaddr(apMac);
+    String str_mac_ap = WiFi.softAPmacAddress();
+    String str_mac_sta = WiFi.macAddress();
+    const MacAddress macaddr(str_mac_ap);
     u8 u8_pass = 0;
     for (size_t i = 0; i < 8; i++)
     {
         u8_pass += (macaddr[i] << (i + 13));
-        M5.Log.printf("macaddr[%d]=%u\n", i, macaddr[i]);
-        M5.Log.printf("u8_pass=%ld\n", u8_pass);
+        //M5.Log.printf("macaddr[%d]=%u\n", i, macaddr[i]);
+        //M5.Log.printf("u8_pass=%ld\n", u8_pass);
     }
 
-    M5.Log.setDisplay(&M5.Display);
     M5.Log.println("setting mode");
 
-    M5.Log.printf(" AP MACADDR      \n: %s\n", apMac.c_str());
-    apMac.replace(":", "");
+    M5.Log.printf("STA MACADDR      \n: %s\n", str_mac_sta.c_str());
+    M5.Log.printf(" AP MACADDR      \n: %s\n", str_mac_ap.c_str());
+    str_mac_ap.replace(":", "");
 
-    String str_ssid = "M5Stack-" + apMac.substring(6);
+    String str_ssid = "M5Stack-" + str_mac_ap.substring(6);
     String str_pass = "00000000" + String(u8_pass);
     str_pass = str_pass.substring(str_pass.length() - 8);
 

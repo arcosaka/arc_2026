@@ -1,6 +1,6 @@
 /**
  * @file mid_pref.cpp
- * @version 26081222.160
+ * @version 26081620.030
  */
 
 #include "mid_pref.h"
@@ -35,7 +35,6 @@ void pref_setup(void) {
     }
     else{
         u4_wifi_ch = 0U;
-        memcpy(chr_wifi_peer, DEVICE_MACADR, sizeof(chr_wifi_peer));
     }
     M5.Log.println("pref_setup end");
 }
