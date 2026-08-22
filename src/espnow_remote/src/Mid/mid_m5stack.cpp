@@ -47,7 +47,10 @@ static u1 u1_disp_britness = 0;
 // 関数定義
 //******************************************************
 
-static void m5stack_get_batt(void){
+static s4 m5stack_get_batt(void){
+    s4 s4_ret = -1;
+
+    M5.Power.getBatteryLevel();
 
 }
 
