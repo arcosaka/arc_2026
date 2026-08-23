@@ -1,0 +1,4 @@
+src/**/.metadata/
+src/**/Debug/
+src/**/Release/
+src/**/.settings/
