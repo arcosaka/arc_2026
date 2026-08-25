@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "NXP_LPC1343_LPCX",
+            "includePath": [
+                "${workspaceFolder}/inc/**",
+                "${workspaceFolder}/lib/**"
+            ],
+            "defines": [
+                "__USE_CMSIS=CMSISv1p30_LPC13xx",
+                "DEBUG",
+                "__CODE_RED",
+                "__REDLIB__"
+            ],
+            "intelliSenseMode": "windows-gcc-arm",
+            "cStandard": "c11",
+            "cppStandard": "c++98"
+        }
+    ],
+    "version": 4
+}
