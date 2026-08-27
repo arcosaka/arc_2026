@@ -31,6 +31,10 @@ typedef uint64_t    U8;
   , (c)\
 )
 
+#define DI()        { U4 u4_mask = __get_PRIMASK();__disable_irq();
+#define EI()        { U4 u4_mask = __get_PRIMASK();__enable_irq();
+#define RI(mask)    __set_PRIMASK(u4_mask);}
+
 //******************************************************
 // グローバル変数宣言
 //******************************************************

@@ -81,6 +81,6 @@ extern U_DATA_CONT serialio_data_c;
 void SerialIO_TxData(void);
 void SerialIO_RxData(void);
 U2 SerialIO_CalcChkSum(U1* pu1_data, U1 u1_size);
-BI SerialIO_CheckChkSum(U1* pu1_data, U1 u1_size, U2 u2_cs);
+BI SerialIO_ValidateChkSum(U1* pu1_data, U1 u1_size, U2 u2_cs);
 
 #endif /* LOAD_APP_SERIALIO_H */

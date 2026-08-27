@@ -21,10 +21,20 @@ U_DATA_CONT serialio_data_c;  /** コントローラ→本体制御データ(RX)
 // ローカル変数定義
 //******************************************************
 
+//******************************************************
+// 関数定義
+//******************************************************
+
+/**
+ * @brief   あらかじめ設定しているデータを相手に送信します
+ */
 void SerialIO_TxData(void){
 
 }
 
+/**
+ * @brief   受信したデータを解析し、グローバル変数に保存します
+ */
 void SerialIO_RxData(void){
 
 }
@@ -39,7 +49,7 @@ U2 SerialIO_CalcChkSum(U1* pu1_data, U1 u1_size){
     return u2_data;
 }
 
-BI SerialIO_CheckChkSum(U1* pu1_data, U1 u1_size, U2 u2_cs){
+BI SerialIO_ValidateChkSum(U1* pu1_data, U1 u1_size, U2 u2_cs){
     U2 u2_data = 0;
     for (U1 u1_i = 0; u1_i < u1_size; u1_i++)
     {
