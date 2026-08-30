@@ -3,6 +3,7 @@
 	<name>VS-WRC103LV_Sample_UART</name>
 	<comment></comment>
 	<projects>
+		<project>CMSISv1p30_LPC13xx</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

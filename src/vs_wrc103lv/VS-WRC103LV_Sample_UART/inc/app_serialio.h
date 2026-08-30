@@ -31,6 +31,12 @@ typedef struct struct_BUTTON{
     U2 dummy    : 1;    /* 15:15 */
 }S_BUTTON;
 
+typedef union union_BUTTON
+{
+    S_BUTTON bits;
+    U2 word;
+} U_BUTTON;
+
 typedef struct struct_DATA_BODY {
                     /**  sz  x  y  */
     U2 header;      /** [ 2: 0: 0] */
@@ -44,12 +50,6 @@ typedef union union_DATA_BODY {
     U1 bytes[sizeof(S_DATA_BODY)];
     S_DATA_BODY data;
 } U_DATA_BODY;
-
-typedef union union_BUTTON
-{
-    S_BUTTON bits;
-    U2 word;
-} U_BUTTON;
 
 typedef struct struct_DATA_CONT {
                     /**  sz  x  y  */

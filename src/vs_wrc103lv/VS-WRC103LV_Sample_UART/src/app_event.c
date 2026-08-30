@@ -3,6 +3,7 @@
  * @version 26081222.160
  */
 
+#include "LPC13xx.h"
 #include "app_event.h"
 
 //******************************************************
@@ -35,6 +36,7 @@ void Event_Init(void){
 }
 
 BI Event_SetEvent(E_EVE e_eve){
+    BI bi_ret = FALSE;
     if(
         (s1_event_index < EVENT_QUEUE_MAX)
      && (e_eve < E_EVE_MAX)
@@ -43,7 +45,9 @@ BI Event_SetEvent(E_EVE e_eve){
         event_queue[s1_event_index] = e_eve;
         s1_event_index++;
         RI();
+        bi_ret = TRUE;
     }
+    return bi_ret;
 }
 
 E_EVE Event_GetEvent(void){
@@ -54,4 +58,5 @@ E_EVE Event_GetEvent(void){
         e_eve = event_queue[s1_event_index] = e_eve;
         RI();
     }
+    return e_eve;
 }
