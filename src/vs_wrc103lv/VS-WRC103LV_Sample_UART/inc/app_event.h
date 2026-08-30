@@ -13,7 +13,10 @@
 //******************************************************
 
 typedef enum enum_EVE{
-    E_EVE_MAIN
+    E_EVE_NONE
+  , E_EVE_MAIN
+  , E_EVE_TX
+  , E_EVE_RX
   , E_EVE_MAX
 } E_EVE;
 
@@ -25,7 +28,8 @@ typedef enum enum_EVE{
 // グローバル関数宣言
 //******************************************************
 
-BI event_SetEvent(E_EVE e_eve);
-E_EVE event_GetEvent(void);
+void Event_Init(void);
+BI Event_SetEvent(E_EVE e_eve);
+E_EVE Event_GetEvent(void);
 
 #endif /* LOAD_APP_EVENT_H */

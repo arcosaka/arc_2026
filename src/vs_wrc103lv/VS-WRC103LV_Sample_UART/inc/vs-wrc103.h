@@ -246,13 +246,10 @@ enum Parity{
 };
 
 void InitSci3(uint32_t baudrate,BYTE parity ,BYTE stop);
-//1バイト受信
-BYTE SciByteRx(BYTE *data);
+uint8_t SciByteRx(BYTE *data);
 uint32_t SciRx(uint8_t* buffer, uint32_t size);
-//1バイト送信
 void SciByteTx(BYTE data);
 void SciTx(uint8_t* buf, uint32_t dataleng);
-//文字列送信
 void SciStrTx(BYTE* str, uint32_t dataleng);
 
 //#define USE_LPC_LINK

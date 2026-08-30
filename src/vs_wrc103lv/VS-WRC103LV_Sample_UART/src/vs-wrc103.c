@@ -1,7 +1,7 @@
 #include "lpc13xx.h"                        /* LPC13xx definitions */
 #include "gpio.h"
 #include "vs-wrc103.h"
-
+#include "app_event.h"
 
 BYTE bBuzzerFlag;
 unsigned int iBuzzerPitch;
@@ -859,6 +859,7 @@ void UART_IRQHandler(void)
     {
       /* Character Time-out indicator */
         UARTStatus |= 0x100;		/* Bit 9 as the CTI error */
+        Event_SetEvent(E_EVE_RX);
     }
     else if (IIRValue == IIR_THRE)	/* THRE, transmit holding register empty */
     {
@@ -877,6 +878,12 @@ void UART_IRQHandler(void)
     return;
 }
 
+/**
+ * @brief UART通信初期化関数
+ * @param[in] baudrate  通信速度
+ * @param[in] parity    パリティ
+ * @param[in] stop      ストップビット
+ */
 void InitSci3(uint32_t baudrate, BYTE parity, BYTE stop) {
     UARTInit(baudrate, parity, stop);
 }
@@ -981,8 +988,14 @@ void UARTSend(uint8_t* BufferPtr, uint32_t Length)
     return;
 }
 
-//1バイト受信
-BYTE SciByteRx(BYTE *data) {
+/**
+ * @brief 1バイト受信
+ * @param[out]  data    受信データ保存先変数のポインタ
+ * @return 受信成功可否
+ * @retval  1:受信成功
+ * @retval  0:受信データなしor受信失敗
+ */
+uint8_t SciByteRx(BYTE *data) {
     if (UARTBuffCount > 0) {
         UARTBuffCount--;
         *data = UARTBuffer[UARTReadCount];
@@ -993,7 +1006,12 @@ BYTE SciByteRx(BYTE *data) {
     return 0;
 }
 
-//nバイト受信
+/**
+ * @brief Nバイト受信
+ * @param[out]  buffer  受信データ保存先変数のポインタ
+ * @param[in]   size    受信サイズ
+ * @return
+ */
 uint32_t SciRx(uint8_t* buffer, uint32_t size) {
     uint32_t u4_retsize = 0;
     uint8_t u1_byte;
@@ -1011,16 +1029,28 @@ uint32_t SciRx(uint8_t* buffer, uint32_t size) {
     return u4_retsize;
 }
 
-//1バイト送信
+/**
+ * @brief 1バイト送信
+ * @param[in] data  送信データ
+ */
 void SciByteTx(BYTE data) {
     UARTSend(&data, 1);
 }
 
+/**
+ * @brief Nバイト送信
+ * @param[in] buf       送信データの先頭ポインタ
+ * @param[in] dataleng  送信データサイズ
+ */
 void SciTx(uint8_t* buf, uint32_t dataleng){
     UARTSend(buf, dataleng);
 }
 
-//文字列送信
+/**
+ * @brief 文字列送信
+ * @param[in] str       送信文字列
+ * @param[in] dataleng  文字列の長さ
+ */
 void SciStrTx(BYTE* str, uint32_t dataleng) {
     UARTSend(str, dataleng);
 }

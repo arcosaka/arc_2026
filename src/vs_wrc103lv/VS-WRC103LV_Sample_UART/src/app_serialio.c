@@ -6,6 +6,8 @@
 #include "app_serialio.h"
 #include "vs-wrc103.h"
 
+#include "app_event.h"
+
 //******************************************************
 // グローバル変数定義
 //******************************************************
@@ -21,6 +23,13 @@ U_DATA_CONT serialio_data_c;  /** コントローラ→本体制御データ(RX)
 // ローカル変数定義
 //******************************************************
 
+#define SERIALIO_DATASIZE               (sizeof(S_DATA_CONT))
+#define SERIALIO_CHKSUMSIZE(pu_cont)    (SERIALIO_DATASIZE - sizeof(pu_cont->data.chksum) - sizeof(pu_cont->data.footer))
+
+U_DATA_CONT* pu_cont_tx = &serialio_data_b;
+U_DATA_CONT* pu_cont_rx = &serialio_data_c;
+U2 u2_cnt = 0;
+
 //******************************************************
 // 関数定義
 //******************************************************
@@ -29,14 +38,36 @@ U_DATA_CONT serialio_data_c;  /** コントローラ→本体制御データ(RX)
  * @brief   あらかじめ設定しているデータを相手に送信します
  */
 void SerialIO_TxData(void){
-
+    pu_cont_tx->data.header = SERIALIO_HEADER;
+    pu_cont_tx->data.stamp = u2_cnt;
+    pu_cont_tx->data.chksum
+        = SerialIO_CalcChkSum(pu_cont_tx->bytes, SERIALIO_CHKSUMSIZE(pu_cont_tx));
+    pu_cont_tx->data.footer = SERIALIO_FOOTER;
+    SciTx(pu_cont_tx->bytes, SERIALIO_DATASIZE);
+    u2_cnt++;
 }
 
 /**
  * @brief   受信したデータを解析し、グローバル変数に保存します
  */
 void SerialIO_RxData(void){
+    uint8_t u1_tmp;
+    U4 u4_read;
+    BI bi_iscsok;
+    u4_read = SciRx(pu_cont_rx->bytes, SERIALIO_DATASIZE);
+    if(
+        (u4_read == SERIALIO_DATASIZE)
+     && (pu_cont_rx->data.header == SERIALIO_HEADER)
+     && (pu_cont_rx->data.footer == SERIALIO_FOOTER)
+    ){
+        bi_iscsok = SerialIO_ValidateChkSum(pu_cont_rx->bytes, SERIALIO_CHKSUMSIZE(pu_cont_rx), pu_cont_rx->data.chksum);
+        if(bi_iscsok){
+            Event_SetEvent(E_EVE_MAIN);
+        }
+    }
 
+    /* 不要な受信データをバッファから削除 */
+    while (SciByteRx(&u1_tmp)){}
 }
 
 U2 SerialIO_CalcChkSum(U1* pu1_data, U1 u1_size){
