@@ -29,7 +29,7 @@ all: VS-WRC103LV_Sample_UART.axf
 VS-WRC103LV_Sample_UART.axf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU Linker'
-	arm-none-eabi-gcc -nostdlib -L"D:/akinao/git/arc_2026/src/vs_wrc103lv/VS-WRC103LV_Sample_UART/lib" -Xlinker --gc-sections -Xlinker -Map=VS-WRC103LV_Sample_UART.map -mcpu=cortex-m3 -mthumb -T "../Debug/vs-wrc103lv_Debug.ld" -o "VS-WRC103LV_Sample_UART.axf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -nostdlib -L"E:/Akinao/git/arc_2026/src/vs_wrc103lv/VS-WRC103LV_Sample_UART/lib" -Xlinker --gc-sections -Xlinker -Map=VS-WRC103LV_Sample_UART.map -mcpu=cortex-m3 -mthumb -T "../Debug/vs-wrc103lv_Debug.ld" -o "VS-WRC103LV_Sample_UART.axf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build

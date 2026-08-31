@@ -1,10 +1,14 @@
 {
+    "env": {
+        "inclusePath_lpcxpresso": "C:/soft/nxp/LPCXpresso_8.2.2_650"
+    },
     "configurations": [
         {
             "name": "NXP_LPC1343_LPCX",
             "includePath": [
                 "${workspaceFolder}/inc/**",
-                "${workspaceFolder}/lib/**"
+                "${workspaceFolder}/lib/**",
+                "${env:inclusePath_lpcxpresso}/lpcxpresso/tools/arm-none-eabi/include/**"
             ],
             "defines": [
                 "__USE_CMSIS=CMSISv1p30_LPC13xx",

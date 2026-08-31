@@ -26,7 +26,7 @@ U_DATA_CONT serialio_data_c;  /** コントローラ→本体制御データ(RX)
 #define SERIALIO_DATASIZE               (sizeof(S_DATA_CONT))
 #define SERIALIO_CHKSUMSIZE(pu_cont)    (SERIALIO_DATASIZE - sizeof(pu_cont->data.chksum) - sizeof(pu_cont->data.footer))
 
-U_DATA_CONT* pu_cont_tx = &serialio_data_b;
+U_DATA_BODY* pu_cont_tx = &serialio_data_b;
 U_DATA_CONT* pu_cont_rx = &serialio_data_c;
 U2 u2_cnt = 0;
 

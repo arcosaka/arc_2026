@@ -1,2 +1,6 @@
 src/**/.metadata/
 src/**/.settings/
+src/**/Debug/src/**
+src/**/Debug/*.axf
+src/**/Debug/*.bin
+src/**/Debug/*.map

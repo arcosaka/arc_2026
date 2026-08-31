@@ -7,6 +7,7 @@
 #define LOAD_TYPEDEF_H
 
 #include "type.h"
+#include "LPC13xx.h"
 
 //******************************************************
 // グローバル型定義
@@ -34,6 +35,7 @@ typedef uint64_t    U8;
 #define DI()        { U4 u4_mask = __get_PRIMASK();__disable_irq();
 #define EI()        { U4 u4_mask = __get_PRIMASK();__enable_irq();
 #define RI(mask)    __set_PRIMASK(u4_mask);}
+#define NOP()       __NOP()
 
 //******************************************************
 // グローバル変数宣言
