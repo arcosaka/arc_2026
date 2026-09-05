@@ -23,25 +23,25 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: VS-WRC103LV_Sample_UART.axf
+all: VS-WRC103LV_Sample_PAD.axf
 
 # Tool invocations
-VS-WRC103LV_Sample_UART.axf: $(OBJS) $(USER_OBJS)
+VS-WRC103LV_Sample_PAD.axf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU Linker'
-	arm-none-eabi-gcc -nostdlib -L"D:/akinao/git/arc_2026/src/vs_wrc103lv/VS-WRC103LV_Sample_UART/lib" -Xlinker --gc-sections -Xlinker -Map=VS-WRC103LV_Sample_UART.map -mcpu=cortex-m3 -mthumb -T "../Debug/vs-wrc103lv_Debug.ld" -o "VS-WRC103LV_Sample_UART.axf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -nostdlib -L"C:/Users/2019228/Documents/LPCXpresso_8.2.2_650/workspace/VS-WRC103LV_Sample_PAD/lib" -Xlinker --gc-sections -Xlinker -Map=VS-WRC103LV_Sample_PAD.map -mcpu=cortex-m3 -mthumb -T "../Debug/vs-wrc103lv_Debug.ld" -o "VS-WRC103LV_Sample_PAD.axf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
 
 # Other Targets
 clean:
-	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) VS-WRC103LV_Sample_UART.axf
+	-$(RM) $(EXECUTABLES)$(OBJS)$(C_DEPS) VS-WRC103LV_Sample_PAD.axf
 	-@echo ' '
 
 post-build:
 	-@echo 'Performing post-build steps'
-	-arm-none-eabi-size VS-WRC103LV_Sample_UART.axf; arm-none-eabi-size VS-WRC103LV_Sample_UART.axf; arm-none-eabi-objcopy -O binary VS-WRC103LV_Sample_UART.axf VS-WRC103LV_Sample_UART.bin; checksum VS-WRC103LV_Sample_UART.bin;
+	-arm-none-eabi-size VS-WRC103LV_Sample_PAD.axf; arm-none-eabi-size VS-WRC103LV_Sample_PAD.axf; arm-none-eabi-objcopy -O binary VS-WRC103LV_Sample_PAD.axf VS-WRC103LV_Sample_PAD.bin; checksum VS-WRC103LV_Sample_PAD.bin;
 	-@echo ' '
 
 .PHONY: all clean dependents

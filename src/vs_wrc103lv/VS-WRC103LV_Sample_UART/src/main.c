@@ -100,6 +100,7 @@ static void main_task(void)
 /*メイン関数***********************************************************/
 int main(void)
 {
+    U1 u1_txtmp = 0U;
     E_EVE e_eve_tmp;
     //制御周期の設定[単位：Hz　範囲：30.0~]
     const unsigned short MainCycle = 60;
@@ -116,7 +117,7 @@ int main(void)
         switch (e_eve_tmp)
         {
             case E_EVE_RX:
-                LED(1); //緑のLED点灯
+                LED(0);
                 SerialIO_RxData();
                 break;
 
@@ -133,15 +134,9 @@ int main(void)
 
             default:
                 Sync();
-                LED(0);
+                LED(1); //緑のLED点灯
+                //SciByteTx((U1)Event_GetQueueCount());
                 break;
         }
-
-        //LED(1);		//緑のLED点灯
-        //if(SciByteRx(&data) > 0){
-        //	LED(2);		//オレンジのLED点灯
-        //	SciByteTx(data);
-        //}
-
     }
 }

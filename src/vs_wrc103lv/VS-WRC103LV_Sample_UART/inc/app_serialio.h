@@ -37,20 +37,6 @@ typedef union union_BUTTON
     U2 word;
 } U_BUTTON;
 
-typedef struct struct_DATA_BODY {
-                    /**  sz  x  y  */
-    U2 header;      /** [ 2: 0: 0] */
-    U2 stamp;       /** [ 2: 1: 0] */
-    U_BUTTON btns;  /** [ 2: 2: 0] */
-    U2 chksum;      /** [ 2: 3: 0] */
-    U2 footer;      /** [ 2: 4: 0] */
-} S_DATA_BODY;      /** 本体→コントローラ制御データ */
-
-typedef union union_DATA_BODY {
-    U1 bytes[sizeof(S_DATA_BODY)];
-    S_DATA_BODY data;
-} U_DATA_BODY;
-
 typedef struct struct_DATA_CONT {
                     /**  sz  x  y  */
     U2 header;      /** [ 2: 0: 0] */
@@ -72,7 +58,7 @@ typedef union union_DATA_CONT {
 #define SERIALIO_HEADER ((U2)0x5A5AU)   /** 送受信データヘッダー */
 #define SERIALIO_FOOTER ((U2)0x0A0DU)   /** 送受信データフッター */
 
-extern U_DATA_BODY serialio_data_b;
+extern U_DATA_CONT serialio_data_b;
 extern U_DATA_CONT serialio_data_c;
 
 //******************************************************

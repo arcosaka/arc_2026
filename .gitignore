@@ -1,6 +1,11 @@
-src/**/.metadata/
-src/**/.settings/
-src/**/Debug/src/**
-src/**/Debug/*.axf
-src/**/Debug/*.bin
-src/**/Debug/*.map
+**/.metadata/
+**/.settings/
+**/Debug/src/**
+**/Release/src/**
+**/*.axf
+**/*.bin
+**/*.map
+**/.vs/**
+**/bin/**
+**/obj/**
+**/*.user

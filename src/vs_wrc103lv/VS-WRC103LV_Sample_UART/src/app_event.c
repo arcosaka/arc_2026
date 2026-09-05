@@ -54,8 +54,13 @@ E_EVE Event_GetEvent(void){
     if(s1_event_index > 0){
         DI();
         s1_event_index--;
+        s1_event_index = (s1_event_index < 0) ? 0 : s1_event_index;
         e_eve = event_queue[s1_event_index] = e_eve;
         RI();
     }
     return e_eve;
+}
+
+U1 Event_GetQueueCount(void){
+    return (U1)((s1_event_index < 0) ? 0 : s1_event_index);
 }

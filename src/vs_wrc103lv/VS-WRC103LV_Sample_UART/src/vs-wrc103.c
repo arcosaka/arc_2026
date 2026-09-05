@@ -815,6 +815,7 @@ volatile uint32_t UARTBuffCount = 0;
 *****************************************************************************/
 void UART_IRQHandler(void)
 {
+    SciByteTx('0');
     uint8_t IIRValue, LSRValue;
     uint8_t Dummy = Dummy;
 
@@ -824,12 +825,14 @@ void UART_IRQHandler(void)
     IIRValue &= 0x07;			/* check bit 1~3, interrupt identification */
     if (IIRValue == IIR_RLS)		/* Receive Line Status */
     {
+        SciByteTx('1');
         LSRValue = LPC_UART->LSR;
         /* Receive Line Status */
         if (LSRValue & (LSR_OE | LSR_PE | LSR_FE | LSR_RXFE | LSR_BI))
         {
-          /* There are errors or break interrupt */
-          /* Read LSR will clear the interrupt */
+            SciByteTx('2');
+            /* There are errors or break interrupt */
+            /* Read LSR will clear the interrupt */
             UARTStatus = LSRValue;
             Dummy = LPC_UART->RBR;	/* Dummy read on RX to clear
                                       interrupt, then bail out */
@@ -837,9 +840,11 @@ void UART_IRQHandler(void)
         }
         if (LSRValue & LSR_RDR)	/* Receive Data Ready */
         {
-          /* If no error on RLS, normal ready, save into the data buffer. */
-          /* Note: read RBR will clear the interrupt */
+            SciByteTx('3');
+            /* If no error on RLS, normal ready, save into the data buffer. */
+            /* Note: read RBR will clear the interrupt */
             if ((UARTWriteCount + 1) % BUFSIZE != UARTReadCount) {
+                SciByteTx('4');
                 UARTBuffer[UARTWriteCount++] = LPC_UART->RBR;
                 UARTWriteCount %= BUFSIZE;
                 UARTBuffCount++;
@@ -848,8 +853,10 @@ void UART_IRQHandler(void)
     }
     else if (IIRValue == IIR_RDA)	/* Receive Data Available */
     {
-      /* Receive Data Available */
+        SciByteTx('5');
+        /* Receive Data Available */
         if ((UARTWriteCount + 1) % BUFSIZE != UARTReadCount) {
+            SciByteTx('6');
             UARTBuffer[UARTWriteCount++] = LPC_UART->RBR;
             UARTWriteCount %= BUFSIZE;
             UARTBuffCount++;
@@ -857,21 +864,26 @@ void UART_IRQHandler(void)
     }
     else if (IIRValue == IIR_CTI)	/* Character timeout indicator */
     {
-      /* Character Time-out indicator */
+        SciByteTx('7');
+        /* Character Time-out indicator */
         UARTStatus |= 0x100;		/* Bit 9 as the CTI error */
         Event_SetEvent(E_EVE_RX);
+        SciByteTx('!');
     }
     else if (IIRValue == IIR_THRE)	/* THRE, transmit holding register empty */
     {
-      /* THRE interrupt */
+        SciByteTx('8');
+        /* THRE interrupt */
         LSRValue = LPC_UART->LSR;		/* Check status in the LSR to see if
                                     valid data in U0THR or not */
         if (LSRValue & LSR_THRE)
         {
+            SciByteTx('9');
             UARTTxEmpty = 1;
         }
         else
         {
+            SciByteTx('A');
             UARTTxEmpty = 0;
         }
     }
@@ -911,10 +923,16 @@ void UARTInit(uint32_t baudrate, BYTE parity, BYTE stop)//,uint8_t ,uint8_t )
 
     NVIC_DisableIRQ(UART_IRQn);
 
-   // LPC_IOCON->PIO1_6 &= ~0x07;    /*  UART I/O config */
-    LPC_IOCON->PIO1_6 = 0x09;     /* UART RXD */
-   // LPC_IOCON->PIO1_7 &= ~0x07;
-    LPC_IOCON->PIO1_7 = 0x09;     /* UART TXD */
+//    // LPC_IOCON->PIO1_6 &= ~0x07;    /*  UART I/O config */
+//     LPC_IOCON->PIO1_6 = 0x09;     /* UART RXD */
+//    // LPC_IOCON->PIO1_7 &= ~0x07;
+//     LPC_IOCON->PIO1_7 = 0x09;     /* UART TXD */
+
+    LPC_IOCON->PIO1_6 =
+        (LPC_IOCON->PIO1_6 & ~0x07UL) | 0x01UL;
+    LPC_IOCON->PIO1_7 =
+        (LPC_IOCON->PIO1_7 & ~0x07UL) | 0x01UL;
+
     /* Enable UART clock */
     LPC_SYSCON->SYSAHBCLKCTRL |= (1 << 12);
     LPC_SYSCON->UARTCLKDIV = 0x1;     /* divided by 1 */

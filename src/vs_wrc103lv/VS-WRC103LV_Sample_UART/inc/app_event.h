@@ -31,5 +31,6 @@ typedef enum enum_EVE{
 void Event_Init(void);
 BI Event_SetEvent(E_EVE e_eve);
 E_EVE Event_GetEvent(void);
+U1 Event_GetQueueCount(void);
 
 #endif /* LOAD_APP_EVENT_H */
